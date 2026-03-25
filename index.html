@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>라이프마케팅실</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; background: linear-gradient(155deg, #F7F2ED 0%, #EDF1F7 100%); min-height: 100vh; }
+    button { font-family: inherit; }
+    input, select { font-family: inherit; }
+
+    /* ── 회식 섹션 스타일 ── */
+    .dinner-info-banner {
+      background: linear-gradient(135deg, #3A2310, #6B3D18);
+      border-radius: 16px;
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 28px;
+      box-shadow: 0 6px 24px rgba(90,40,10,0.18);
+    }
+    .dinner-info-banner .info-block { display: flex; align-items: center; gap: 12px; }
+    .dinner-info-banner .info-icon { font-size: 22px; }
+    .dinner-info-banner .info-label { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 3px; }
+    .dinner-info-banner .info-value { font-size: 16px; color: #fff; font-weight: 800; }
+    .dinner-info-banner .info-tba { font-size: 14px; color: rgba(255,255,255,0.6); font-weight: 700; letter-spacing: 0.05em; }
+    .dinner-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.2); }
+
+    .d-tab-wrap { display: flex; gap: 6px; justify-content: flex-start; margin-bottom: 24px; }
+    .d-tab { padding: 8px 24px; border-radius: 20px; border: 1.5px solid #E4DDD4; background: #fff; color: #9a8f87; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .d-tab:hover { border-color: #B87A4A; color: #B87A4A; }
+    .d-tab.active { background: #B87A4A; border-color: #B87A4A; color: #fff; }
+
+    .d-tables-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; max-width: 1200px; margin: 0 auto; justify-items: center; }
+    .d-table-card { background: #fff; border: 1px solid #e4ddd4; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 14px rgba(0,0,0,0.07); transition: transform 0.18s, box-shadow 0.18s; }
+    .d-table-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.11); }
+    .d-table-header { padding: 13px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0ebe5; }
+    .d-table-num { font-family: 'DM Mono', monospace; font-size: 11px; color: #b0a89e; letter-spacing: 1px; margin-bottom: 2px; }
+    .d-table-title { font-weight: 800; font-size: 15px; color: #2d2520; }
+    .d-seat-count { font-size: 12px; background: rgba(0,0,0,0.06); color: #9a8f87; padding: 3px 11px; border-radius: 20px; font-weight: 700; }
+    .d-members { padding: 10px 12px; display: flex; flex-direction: column; gap: 5px; }
+    .d-member { display: flex; align-items: center; gap: 8px; padding: 6px 9px; border-radius: 9px; background: #faf7f4; border: 1px solid transparent; font-size: 13px; transition: all 0.15s; }
+    .d-member:hover { background: #f2ede8; border-color: #e4ddd4; }
+    .d-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .d-name { flex: 1; font-weight: 700; color: #2d2520; }
+    .d-team { font-size: 10px; padding: 2px 8px; border-radius: 5px; font-weight: 700; letter-spacing: 0.2px; }
+    .d-gender { font-size: 11px; font-weight: 800; }
+    .d-gender.m { color: #4A7FB5; }
+    .d-gender.f { color: #B05A7A; }
+    .d-leader { font-size: 10px; color: #fff; background: #C4955A; padding: 2px 7px; border-radius: 5px; font-weight: 800; }
+
+    /* 범례 */
+    .d-legend { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; margin-bottom: 22px; }
+    .d-legend-item { display: flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #e4ddd4; border-radius: 20px; padding: 5px 13px; font-size: 12px; color: #2d2520; font-weight: 600; }
+
+    /* 자리배치 이미지 영역 */
+    .seat-image-section { max-width: 900px; margin: 32px auto 0; text-align: left; }
+    .seat-image-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .seat-image-bar { width: 4px; height: 22px; background: linear-gradient(#B87A4A, #5A7A6A); border-radius: 4px; }
+    .seat-image-title { font-size: 15px; font-weight: 800; color: #1a1a1a; }
+    .seat-image-placeholder { border: 2px dashed #D4C8BC; border-radius: 16px; background: #FDFAF7; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 220px; gap: 10px; color: #b0a89e; }
+    .seat-image-placeholder .ph-icon { font-size: 40px; opacity: 0.5; }
+    .seat-image-placeholder .ph-text { font-size: 14px; font-weight: 700; }
+    .seat-image-placeholder .ph-sub { font-size: 12px; opacity: 0.7; }
+    .seat-image-box { border-radius: 16px; overflow: hidden; border: 1px solid #e4ddd4; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+    .seat-image-box img { width: 100%; display: block; }
+
+    @media(max-width: 600px) {
+      .d-tables-grid { grid-template-columns: 1fr; }
+      .dinner-info-banner { flex-direction: column; }
+      .dinner-divider { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    /* ──────────────────────────────────────
+       ORG 데이터
+    ────────────────────────────────────── */
+    const initialTeams = [
+      {
+        id: "mk1", name: "마케팅 1팀", color: "#B87A4A", accentColor: "#FDF0E6",
+        products: ["목베개플러스", "목마사지베개V2", "프로모션", "서브SKU"],
+        leader: { name: "허근", role: "팀장", subRole: "마케터" },
+        members: [
+          { name: "김익환", role: "마케터 / 파트장" },
+          { name: "김희진", role: "마케터" },
+          { name: "김상화", role: "콘텐츠마케터", note: "프리랜서" },
+          { name: "최현진", role: "콘텐츠마케터" },
+        ],
+      },
+      {
+        id: "mk2", name: "마케팅 2팀", subtitle: "콘텐츠팀",
+        color: "#4A7FB5", accentColor: "#EBF3FB",
+        products: ["주요 SKU 킬콘 발굴"],
+        leader: { name: "우희강", role: "팀장", subRole: "마케터" },
+        members: [
+          { name: "권민창", role: "퍼포먼스 마케터" },
+          { name: "김진호", role: "영상 PD", note: "콘텐츠마케터 전환 필요" },
+          { name: "박연",   role: "영상 PD", note: "콘텐츠마케터 전환 필요" },
+          { name: "배가영", role: "영상 PD", note: "콘텐츠마케터 전환 필요" },
+          { name: "황은인", role: "영상 PD", note: "콘텐츠마케터 전환 필요" },
+          { name: "최예슬", role: "영상 PD", note: "콘텐츠마케터 전환 필요" },
+        ],
+      },
+      {
+        id: "mk3", name: "마케팅 3팀", color: "#B87A4A", accentColor: "#FDF0E6",
+        products: ["허펀케", "발편케", "골반마사지기"],
+        leader: { name: "오도근", role: "팀장", subRole: "마케터" },
+        members: [
+          { name: "최연희", role: "마케터 / 파트장" },
+          { name: "김택정", role: "퍼포먼스 마케터" },
+          { name: "류선주", role: "콘텐츠마케터" },
+          { name: "김보람", role: "콘텐츠마케터" },
+          { name: "남의현", role: "콘텐츠마케터" },
+          { name: "박은솔", role: "콘텐츠마케터" },
+        ],
+      },
+      {
+        id: "d2c", name: "D2C팀", color: "#5A7A6A", accentColor: "#EDF4F0",
+        products: [],
+        leader: { name: "이수지", role: "팀장", subRole: "겸직" },
+        members: [
+          { name: "이채림", role: "온사이트마케터" },
+          { name: "김희재", role: "콘텐츠기획자" },
+          { name: "김동일", role: "MD" },
+          { name: "전보경", role: "CRM 마케터" },
+          { name: "이은서", role: "웹퍼블리셔" },
+          { name: "박지우", role: "데이터엔지니어" },
+          { name: "전찬희", role: "바이럴마케터" },
+        ],
+      },
+    ];
+
+    const TEAM_OPTIONS = [
+      { id: "",    label: "미배정",     color: "#aaa",    bg: "#f5f5f5" },
+      { id: "mk1", label: "마케팅 1팀", color: "#B87A4A", bg: "#FDF0E6" },
+      { id: "mk3", label: "마케팅 3팀", color: "#B87A4A", bg: "#FDF3E8" },
+      { id: "mk2", label: "마케팅 2팀", color: "#4A7FB5", bg: "#EBF3FB" },
+      { id: "d2c", label: "D2C팀",      color: "#5A7A6A", bg: "#EDF4F0" },
+      { id: "bm",  label: "BM팀",       color: "#8A4A7A", bg: "#F4EBF5" },
+    ];
+
+    const initialProducts = [
+      { id:"p1",  quarter:"1Q 2026",    name:"종아리편한케어 Sub",       openDate:"2026-02-02", manager:"이예은", teamId:"mk3", type:"sub"    },
+      { id:"p2",  quarter:"1Q 2026",    name:"발편한케어 V2",             openDate:"2026-02-23", manager:"이예은", teamId:"mk3", type:"main"   },
+      { id:"p3",  quarter:"1Q 2026",    name:"목 마사지 베개 V2",         openDate:"2026-03-30", manager:"이예은", teamId:"mk1", type:"main"   },
+      { id:"p4",  quarter:"2Q 2026",    name:"골반 마사지기",             openDate:"2026-04-27", manager:"김민경", teamId:"mk3", type:"main"   },
+      { id:"p5",  quarter:"2Q 2026",    name:"마그네슘 시너지 크림 GWP",  openDate:"2026-04-13", manager:"김민경", teamId:"",    type:"gwp"    },
+      { id:"p6",  quarter:"2Q 2026",    name:"팔꿈치 마사지기",           openDate:"2026-05-11", manager:"김민경", teamId:"mk3", type:"main"   },
+      { id:"p7",  quarter:"2Q 2026",    name:"바디 풀고컷",               openDate:"2026-05-26", manager:"김민경", teamId:"bm",  type:"main",  coTeam:"mk2" },
+      { id:"p8",  quarter:"2Q 2026",    name:"트리플 샷 시너지 젤 GWP",   openDate:"2026-05-13", manager:"김민경", teamId:"",    type:"gwp"    },
+      { id:"p9",  quarter:"2Q 2026",    name:"훌라핏 벨트",               openDate:"2026-05-27", manager:"김민경", teamId:"bm",  type:"main",  coTeam:"mk2" },
+      { id:"p10", quarter:"2Q 2026",    name:"허리 마사지기 V3",           openDate:"2026-06-15", manager:"배지연", teamId:"mk3", type:"main"   },
+      { id:"p11", quarter:"2Q 2026",    name:"넥코어 목 마사지기",         openDate:"2026-08-17", manager:"배지연", teamId:"mk2", type:"main"   },
+      { id:"p12", quarter:"3Q-4Q 2026", name:"겨울 시즌 상품",            openDate:"TBD",        manager:"",      teamId:"",    type:"season" },
+      { id:"p13", quarter:"1Q 2027",    name:"무릎 마사지기",             openDate:"2027-01",    manager:"이예은", teamId:"mk3", type:"main"   },
+      { id:"p14", quarter:"1Q 2027",    name:"베개 마사지기",             openDate:"2027-02",    manager:"이예은", teamId:"mk1", type:"main"   },
+    ];
+
+    const roleConfig = {
+      "팀장":            { color: "#7C3E0E", bg: "#FEF0E6" },
+      "퍼포먼스 마케터": { color: "#1A4F8A", bg: "#E8F0FA" },
+      "CRM 마케터":      { color: "#1A4F8A", bg: "#E8F0FA" },
+      "마케터":          { color: "#2D5A8A", bg: "#EBF3FB" },
+      "콘텐츠마케터":    { color: "#2D6B3A", bg: "#E8F5EC" },
+      "콘텐츠기획자":    { color: "#6B4E1A", bg: "#FBF3E4" },
+      "영상 PD":         { color: "#6A2D8A", bg: "#F4EBF9" },
+      "온사이트마케터":  { color: "#1A6A5A", bg: "#E4F5F1" },
+      "바이럴마케터":    { color: "#5A1A7A", bg: "#F2E8FA" },
+      "데이터엔지니어":  { color: "#1A5A6A", bg: "#E4F0F5" },
+      "웹퍼블리셔":      { color: "#6A2D4A", bg: "#F5E8EF" },
+      "MD":              { color: "#3A5A3A", bg: "#E8F4E8" },
+    };
+
+    function getRoleConf(role) {
+      if (roleConfig[role]) return roleConfig[role];
+      for (const key of Object.keys(roleConfig)) {
+        if (role.includes(key)) return roleConfig[key];
+      }
+      return { color: "#555", bg: "#f0f0f0" };
+    }
+
+    const typeConfig = {
+      main:   { label: "Main",  color: "#2D5A8A", bg: "#EBF3FB" },
+      sub:    { label: "Sub",   color: "#5A7A3A", bg: "#EDF5E4" },
+      gwp:    { label: "GWP",   color: "#7A5A2A", bg: "#FBF3E4" },
+      season: { label: "시즌",  color: "#6A3A8A", bg: "#F4EBF9" },
+    };
+
+    const editBtnStyle = (color) => ({
+      width: 22, height: 22, borderRadius: 5,
+      border: `1px solid ${color}44`, background: `${color}12`,
+      color, fontSize: 12, fontWeight: 800, cursor: "pointer",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: 0, lineHeight: 1,
+    });
+
+    function EditableText({ value, onChange, style, placeholder }) {
+      return (
+        <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+          style={{
+            border: "1.5px dashed #AACCEE", borderRadius: 5, padding: "2px 6px",
+            fontSize: "inherit", fontWeight: "inherit", fontFamily: "inherit",
+            color: "inherit", background: "#F0F7FF", outline: "none",
+            width: "100%", boxSizing: "border-box", ...style,
+          }}
+        />
+      );
+    }
+
+    function MemberRow({ member, isLeader, teamColor, editMode, onChange, onDelete, onAddBelow }) {
+      const conf = getRoleConf(isLeader ? "팀장" : member.role);
+      return (
+        <div style={{
+          display: "flex", alignItems: "flex-start", gap: 8,
+          padding: isLeader ? "10px 10px" : "7px 10px",
+          background: isLeader ? `${teamColor}12` : "#FAFAFA",
+          border: isLeader ? `1.5px solid ${teamColor}55` : "1px solid #EBEBEB",
+          borderRadius: 9, marginBottom: 5,
+        }}>
+          <div style={{
+            width: isLeader ? 34 : 28, height: isLeader ? 34 : 28, borderRadius: "50%",
+            background: isLeader ? `linear-gradient(135deg, ${teamColor}, ${teamColor}99)` : `${conf.color}20`,
+            border: isLeader ? `2px solid ${teamColor}` : `1.5px solid ${conf.color}44`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: isLeader ? 14 : 11, fontWeight: 800,
+            color: isLeader ? "#fff" : conf.color, flexShrink: 0, marginTop: 2,
+          }}>
+            {(member.name || "?")[0]}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+              {editMode && !isLeader
+                ? <EditableText value={member.name} onChange={v => onChange({ ...member, name: v })} style={{ fontSize: 13, fontWeight: 700, maxWidth: 80 }} placeholder="이름" />
+                : <span style={{ fontWeight: isLeader ? 800 : 700, fontSize: isLeader ? 14 : 13, color: "#111" }}>{member.name}</span>
+              }
+              {editMode && !isLeader
+                ? <EditableText value={member.role} onChange={v => onChange({ ...member, role: v })} style={{ fontSize: 10, fontWeight: 700, maxWidth: 120, color: conf.color }} placeholder="직무" />
+                : <span style={{ fontSize: 10, fontWeight: 700, color: isLeader ? teamColor : conf.color, background: isLeader ? `${teamColor}18` : conf.bg, padding: "2px 8px", borderRadius: 20, border: `1px solid ${isLeader ? teamColor : conf.color}33` }}>
+                    {isLeader ? `팀장 · ${member.subRole}` : member.role}
+                  </span>
+              }
+              {isLeader && member.note === "신규" && (
+                <span style={{ fontSize: 9, fontWeight: 800, color: "#fff", background: "#E74C3C", padding: "2px 7px", borderRadius: 20 }}>NEW</span>
+              )}
+            </div>
+            {editMode && !isLeader
+              ? <EditableText value={member.note || ""} onChange={v => onChange({ ...member, note: v || undefined })} style={{ fontSize: 10, marginTop: 4, maxWidth: 200 }} placeholder="메모 (선택)" />
+              : member.note
+                ? <div style={{ marginTop: 4, display: "inline-flex", alignItems: "center", gap: 4, fontSize: 10,
+                    color: member.note === "프리랜서" ? "#5A6A8A" : "#C0392B",
+                    background: member.note === "프리랜서" ? "#EEF2FA" : "#FFF0EE",
+                    padding: "2px 8px", borderRadius: 6, fontWeight: 600,
+                    border: member.note === "프리랜서" ? "1px solid #C0CCE0" : "1px solid #F5C6C2" }}>
+                    {member.note === "프리랜서" ? "🔗" : "⚠️"} {member.note}</div>
+                : null
+            }
+          </div>
+          {editMode && !isLeader && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 3, flexShrink: 0 }}>
+              <button onClick={onAddBelow} style={editBtnStyle("#2D6B3A")}>+</button>
+              <button onClick={onDelete} style={editBtnStyle("#C0392B")}>✕</button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function TeamCard({ team, editMode, onTeamChange }) {
+      const [open, setOpen] = useState(true);
+      const total = 1 + team.members.length;
+      const updateMember = (i, u) => { const m = [...team.members]; m[i] = u; onTeamChange({ ...team, members: m }); };
+      const deleteMember = (i) => onTeamChange({ ...team, members: team.members.filter((_, j) => j !== i) });
+      const addMemberAfter = (i) => { const m = [...team.members]; m.splice(i + 1, 0, { name: "이름", role: "직무" }); onTeamChange({ ...team, members: m }); };
+      const updateProduct = (i, v) => { const p = [...team.products]; p[i] = v; onTeamChange({ ...team, products: p }); };
+      const deleteProduct = (i) => onTeamChange({ ...team, products: team.products.filter((_, j) => j !== i) });
+
+      return (
+        <div style={{ background: "#fff", borderRadius: 16, overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.07)", border: `1.5px solid ${editMode ? "#AACCEE" : team.color + "33"}`, minWidth: 255, flex: "1 1 255px", maxWidth: 310 }}>
+          <div style={{ background: `linear-gradient(140deg, ${team.color} 0%, ${team.color}BB 100%)`, padding: "14px 16px 12px", cursor: editMode ? "default" : "pointer", userSelect: "none" }} onClick={() => !editMode && setOpen(o => !o)}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                {editMode
+                  ? <input value={team.name} onChange={e => onTeamChange({ ...team, name: e.target.value })} style={{ background: "rgba(255,255,255,0.25)", border: "1.5px dashed rgba(255,255,255,0.7)", borderRadius: 6, color: "#fff", fontWeight: 800, fontSize: 16, padding: "2px 8px", outline: "none", width: 140 }} />
+                  : <div style={{ color: "#fff", fontWeight: 800, fontSize: 17 }}>{team.name}</div>
+                }
+                {team.subtitle && <div style={{ color: "rgba(255,255,255,0.78)", fontSize: 11, fontWeight: 600, marginTop: 2 }}>({team.subtitle})</div>}
+              </div>
+              <span style={{ background: "rgba(255,255,255,0.22)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20 }}>{total}명</span>
+            </div>
+          </div>
+          {(team.products.length > 0 || editMode) && (
+            <div style={{ background: team.accentColor, borderBottom: `1px solid ${team.color}22`, padding: "10px 12px 12px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 8 }}>
+                <div style={{ width: 3, height: 12, background: team.color, borderRadius: 2 }} />
+                <span style={{ fontSize: 10, fontWeight: 800, color: team.color, letterSpacing: "0.1em", textTransform: "uppercase" }}>기존 담당 제품</span>
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {team.products.map((p, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 5, background: "#fff", border: `1.5px solid ${editMode ? "#AACCEE" : "#E2D8CE"}`, borderRadius: 8, padding: "5px 9px", flex: "1 1 calc(50% - 3px)", minWidth: 90, boxSizing: "border-box" }}>
+                    {editMode
+                      ? <><EditableText value={p} onChange={v => updateProduct(i, v)} style={{ fontSize: 12, fontWeight: 700 }} placeholder="제품명" /><button onClick={() => deleteProduct(i)} style={editBtnStyle("#C0392B")}>✕</button></>
+                      : <span style={{ fontSize: 12, fontWeight: 700, color: "#2a2a2a" }}>{p}</span>
+                    }
+                  </div>
+                ))}
+                {editMode && <button onClick={() => onTeamChange({ ...team, products: [...team.products, "새 제품"] })} style={{ fontSize: 11, fontWeight: 700, color: team.color, background: "#fff", border: `1.5px dashed ${team.color}`, borderRadius: 8, padding: "5px 10px", cursor: "pointer" }}>+ 추가</button>}
+              </div>
+            </div>
+          )}
+          {(open || editMode) && (
+            <div style={{ padding: "12px 12px 10px" }}>
+              <MemberRow member={team.leader} isLeader teamColor={team.color} editMode={editMode} onChange={() => {}} />
+              <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "8px 0 6px" }}>
+                <div style={{ flex: 1, height: 1, background: "#EBEBEB" }} />
+                <span style={{ fontSize: 10, color: "#bbb", fontWeight: 700 }}>팀원 {team.members.length}명</span>
+                <div style={{ flex: 1, height: 1, background: "#EBEBEB" }} />
+              </div>
+              {team.members.map((m, i) => (
+                <MemberRow key={i} member={m} teamColor={team.color} editMode={editMode}
+                  onChange={u => updateMember(i, u)} onDelete={() => deleteMember(i)} onAddBelow={() => addMemberAfter(i)} />
+              ))}
+              {editMode && (
+                <button onClick={() => addMemberAfter(team.members.length - 1)} style={{ width: "100%", marginTop: 4, padding: "7px", fontSize: 11, fontWeight: 700, color: team.color, background: `${team.color}08`, border: `1.5px dashed ${team.color}55`, borderRadius: 8, cursor: "pointer" }}>+ 팀원 추가</button>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* ── 신제품 라인업 ── */
+    const QUARTERS = ["1Q 2026", "2Q 2026", "3Q-4Q 2026", "1Q 2027"];
+    const qConfig = {
+      "1Q 2026":    { label: "1Q 2026",    color: "#5A8AB5", bg: "#EBF3FB" },
+      "2Q 2026":    { label: "2Q 2026",    color: "#6B9A5A", bg: "#EDF5E8" },
+      "3Q-4Q 2026": { label: "3Q-4Q 2026", color: "#9A7A5A", bg: "#FAF3E8" },
+      "1Q 2027":    { label: "1Q 2027 ★",  color: "#7A5AB5", bg: "#F0EBFB" },
+    };
+    function TeamBadge({ teamId }) {
+      const t = TEAM_OPTIONS.find(o => o.id === teamId) || TEAM_OPTIONS[0];
+      return <span style={{ fontSize: 10, fontWeight: 700, color: t.color, background: t.bg, padding: "2px 8px", borderRadius: 20, border: `1px solid ${t.color}44`, whiteSpace: "nowrap" }}>{t.label}</span>;
+    }
+    function ProductCard({ product, editMode, onChange }) {
+      const tc = typeConfig[product.type] || typeConfig.main;
+      const isUnassigned = !product.teamId;
+      return (
+        <div style={{ background: "#fff", borderRadius: 10, border: isUnassigned && !editMode ? "1.5px dashed #ddd" : "1.5px solid #E8E8E8", padding: "10px 12px", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column", gap: 6, opacity: isUnassigned && !editMode ? 0.7 : 1 }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 6 }}>
+            {editMode
+              ? <EditableText value={product.name} onChange={v => onChange({ ...product, name: v })} style={{ fontSize: 13, fontWeight: 700 }} placeholder="제품명" />
+              : <span style={{ fontSize: 13, fontWeight: 700, color: "#111", lineHeight: 1.3 }}>{product.name}</span>
+            }
+            <span style={{ fontSize: 10, fontWeight: 700, color: tc.color, background: tc.bg, padding: "2px 7px", borderRadius: 20, border: `1px solid ${tc.color}33`, flexShrink: 0 }}>{tc.label}</span>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5, alignItems: "center" }}>
+            <span style={{ fontSize: 10, color: "#888", background: "#F5F5F5", padding: "2px 7px", borderRadius: 6, fontWeight: 600 }}>📅 {product.openDate}</span>
+            {product.manager && <span style={{ fontSize: 10, color: "#666", background: "#F5F5F5", padding: "2px 7px", borderRadius: 6, fontWeight: 600 }}>👤 {product.manager}</span>}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 10, color: "#aaa", fontWeight: 600, whiteSpace: "nowrap" }}>담당팀</span>
+            {editMode
+              ? <select value={product.teamId} onChange={e => onChange({ ...product, teamId: e.target.value })} style={{ fontSize: 11, fontWeight: 700, border: "1.5px solid #AACCEE", borderRadius: 6, padding: "3px 6px", background: "#F0F7FF", color: "#333", outline: "none", cursor: "pointer", flex: 1 }}>
+                  {TEAM_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+                </select>
+              : <><TeamBadge teamId={product.teamId} />{product.coTeam && <><span style={{ fontSize: 10, color: "#bbb", fontWeight: 700 }}>+</span><TeamBadge teamId={product.coTeam} /></>}</>
+            }
+          </div>
+        </div>
+      );
+    }
+    function ProductRoadmap({ products, editMode, onProductsChange }) {
+      const updateProduct = (id, updated) => onProductsChange(products.map(p => p.id === id ? updated : p));
+      return (
+        <div style={{ maxWidth: 1300, margin: "48px auto 0", padding: "0 4px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+            <div style={{ width: 4, height: 28, background: "linear-gradient(#4A7FB5, #B87A4A)", borderRadius: 4 }} />
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a" }}>📦 신제품 라인업 & 팀 배정</div>
+              <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>2026–2027 신제품 출시 계획 및 마케팅 담당팀 배정</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
+            {QUARTERS.map(q => {
+              const qp = products.filter(p => p.quarter === q);
+              const qc = qConfig[q];
+              return (
+                <div key={q} style={{ flex: "1 1 220px", minWidth: 220, maxWidth: 300 }}>
+                  <div style={{ background: `linear-gradient(135deg, ${qc.color}, ${qc.color}CC)`, borderRadius: "10px 10px 0 0", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ color: "#fff", fontWeight: 800, fontSize: 14 }}>{qc.label}</span>
+                    <span style={{ background: "rgba(255,255,255,0.25)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20 }}>{qp.length}개</span>
+                  </div>
+                  <div style={{ background: qc.bg, borderRadius: "0 0 10px 10px", border: `1.5px solid ${qc.color}33`, borderTop: "none", padding: "10px", display: "flex", flexDirection: "column", gap: 8 }}>
+                    {qp.map(p => <ProductCard key={p.id} product={p} editMode={editMode} onChange={u => updateProduct(p.id, u)} />)}
+                    {qp.length === 0 && <div style={{ textAlign: "center", color: "#bbb", fontSize: 12, padding: "20px 0" }}>제품 없음</div>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    /* ── 슬랙 채널 ── */
+    const slackGroups = [
+      {
+        groupLabel: "변경",
+        groupColor: "#1A4F8A",
+        groupBg: "#E8F0FA",
+        channels: [
+          { status: "변경", handle: "1_마케팅ps",  newHandle: "1_라이프마케팅",         desc: "라이프마케팅실 내 팀 단위 협업 (마케팅, d2c 타팀 소통/협업 일체)" },
+          { status: "변경", handle: "1_퍼포먼스",  newHandle: "1_라이프마케팅_마케팅1", desc: "마케팅 1팀 내부 업무 소통" },
+          { status: "변경", handle: "1_d2c",       newHandle: "1_라이프마케팅_d2c",     desc: "D2C팀 내 모든 업무 소통 (컨펌, 담당자 간 협업)" },
+        ]
+      },
+      {
+        groupLabel: "신설",
+        groupColor: "#7A3A8A",
+        groupBg: "#F4EBF9",
+        channels: [
+          { status: "신설", handle: "1_라이프마케팅_마케팅2", newHandle: null, desc: "마케팅 2팀 내부 업무 소통" },
+          { status: "신설", handle: "1_라이프마케팅_마케팅3", newHandle: null, desc: "마케팅 3팀 내부 업무 소통" },
+        ]
+      },
+    ];
+    const keepChannels = [
+      { handle: "0_sloom",            desc: "라이프마케팅실 ↔ 타팀 협업 일체" },
+      { handle: "0_sloom_최종콘텐츠", desc: "제작 완료 소재 업로드" },
+    ];
+    const statusConf = {
+      "변경": { color: "#1A4F8A", bg: "#E8F0FA", border: "#B5D4F4" },
+      "유지": { color: "#2D6B3A", bg: "#E8F5EC", border: "#9FE1CB" },
+      "신설": { color: "#7A3A8A", bg: "#F4EBF9", border: "#D4A8E8" },
+    };
+    function SlackView() {
+      return (
+        <div style={{ maxWidth: 860, margin: "0 auto", display: "flex", flexDirection: "column", gap: 24 }}>
+          {slackGroups.map((group, gi) => (
+            <div key={gi}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                <div style={{ width: 4, height: 18, background: group.groupColor, borderRadius: 4 }} />
+                <span style={{ fontSize: 13, fontWeight: 800, color: group.groupColor, background: group.groupBg, padding: "3px 14px", borderRadius: 20, border: `1px solid ${group.groupColor}44` }}>
+                  {group.groupLabel}
+                </span>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {group.channels.map((ch, i) => {
+                  const sc = statusConf[ch.status];
+                  return (
+                    <div key={i} style={{ background: "#fff", border: `1px solid ${sc.border}`, borderLeft: `4px solid ${sc.color}`, borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: sc.color, background: sc.bg, padding: "3px 10px", borderRadius: 20, flexShrink: 0, minWidth: 36, textAlign: "center" }}>{ch.status}</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, minWidth: 280 }}>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: ch.newHandle ? "#aaa" : "#222", fontFamily: "monospace, 'Noto Sans KR'", textDecoration: ch.newHandle ? "line-through" : "none" }}>#{ch.handle}</span>
+                        {ch.newHandle && <>
+                          <span style={{ fontSize: 12, color: "#bbb" }}>→</span>
+                          <span style={{ fontSize: 13, fontWeight: 800, color: "#222", fontFamily: "monospace, 'Noto Sans KR'" }}>#{ch.newHandle}</span>
+                        </>}
+                      </div>
+                      <span style={{ fontSize: 13, color: "#555" }}>{ch.desc}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+              <div style={{ width: 4, height: 18, background: "#2D6B3A", borderRadius: 4 }} />
+              <span style={{ fontSize: 13, fontWeight: 800, color: "#2D6B3A", background: "#E8F5EC", padding: "3px 14px", borderRadius: 20, border: "1px solid #2D6B3A44" }}>유지</span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {keepChannels.map((ch, i) => (
+                <div key={i} style={{ background: "#fff", border: "1px solid #9FE1CB", borderLeft: "4px solid #2D6B3A", borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: "#2D6B3A", background: "#E8F5EC", padding: "3px 10px", borderRadius: 20, flexShrink: 0, minWidth: 36, textAlign: "center" }}>유지</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#222", fontFamily: "monospace, 'Noto Sans KR'", minWidth: 280 }}>#{ch.handle}</span>
+                  <span style={{ fontSize: 13, color: "#555" }}>{ch.desc}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ──────────────────────────────────────
+       회식 배치 데이터
+    ────────────────────────────────────── */
+    const TC = {
+      mk1: { dot: "#8a7060", bg: "rgba(138,112,96,0.12)",  color: "#8a7060",  label: "마케팅 1팀" },
+      mk2: { dot: "#7a94b0", bg: "rgba(122,148,176,0.12)", color: "#7a94b0",  label: "마케팅 2팀" },
+      mk3: { dot: "#b07a5a", bg: "rgba(176,122,90,0.12)",  color: "#b07a5a",  label: "마케팅 3팀" },
+      d2c: { dot: "#5f8c7a", bg: "rgba(95,140,122,0.12)",  color: "#5f8c7a",  label: "D2C팀"     },
+    };
+
+    // 6명 × 4테이블
+    const tables6 = [
+      {
+        num:"01", title:"🌿 Table 1", color:"#8a7060",
+        members:[
+          { name:"허근",  team:"mk1", gender:"m", leader:true },
+          { name:"김택정",team:"mk3", gender:"m" },
+          { name:"이채림",team:"d2c", gender:"f" },
+          { name:"김동일",team:"d2c", gender:"m" },
+          { name:"김희진",team:"mk1", gender:"f" },
+          { name:"배가영",team:"mk2", gender:"f" },
+        ]
+      },
+      {
+        num:"02", title:"🔥 Table 2", color:"#5f8c7a",
+        members:[
+          { name:"이수지",team:"d2c", gender:"f", leader:true },
+          { name:"김보람",team:"mk3", gender:"f" },
+          { name:"김진호",team:"mk2", gender:"m" },
+          { name:"황은인",team:"mk2", gender:"f" },
+          { name:"김희재",team:"d2c", gender:"f" },
+        ]
+      },
+      {
+        num:"03", title:"💫 Table 3", color:"#b07a5a",
+        members:[
+          { name:"오도근",team:"mk3", gender:"m", leader:true },
+          { name:"최연희",team:"mk3", gender:"f" },
+          { name:"권민창",team:"mk2", gender:"m" },
+          { name:"류선주",team:"mk3", gender:"f" },
+          { name:"전보경",team:"d2c", gender:"f" },
+          { name:"박지우",team:"d2c", gender:"f" },
+        ]
+      },
+      {
+        num:"04", title:"⚡ Table 4", color:"#7a94b0",
+        members:[
+          { name:"우희강",team:"mk2", gender:"m", leader:true },
+          { name:"김익환",team:"mk1", gender:"m" },
+          { name:"남의현",team:"mk3", gender:"f" },
+          { name:"최현진",team:"mk1", gender:"f" },
+          { name:"이은서",team:"d2c", gender:"f" },
+          { name:"전찬희",team:"d2c", gender:"f" },
+        ]
+      },
+    ];
+
+    // 8명 × 3테이블 (7 / 8 / 8)
+    const tables8 = [
+      {
+        num:"01", title:"🌿 Table 1", color:"#5f8c7a",
+        members:[
+          { name:"이수지",team:"d2c", gender:"f", leader:true },
+          { name:"김보람",team:"mk3", gender:"f" },
+          { name:"김희재",team:"d2c", gender:"f" },
+          { name:"황은인",team:"mk2", gender:"f" },
+          { name:"김진호",team:"mk2", gender:"m" },
+          { name:"김택정",team:"mk3", gender:"m" },
+        ]
+      },
+      {
+        num:"02", title:"🔥 Table 2", color:"#b07a5a",
+        members:[
+          { name:"오도근",team:"mk3", gender:"m", leader:true },
+          { name:"허근",  team:"mk1", gender:"m", leader:true },
+          { name:"최연희",team:"mk3", gender:"f" },
+          { name:"배가영",team:"mk2", gender:"f" },
+          { name:"권민창",team:"mk2", gender:"m" },
+          { name:"전찬희",team:"d2c", gender:"f" },
+          { name:"전보경",team:"d2c", gender:"f" },
+          { name:"남의현",team:"mk3", gender:"f" },
+        ]
+      },
+      {
+        num:"03", title:"💫 Table 3", color:"#7a94b0",
+        members:[
+          { name:"우희강",team:"mk2", gender:"m", leader:true },
+          { name:"김익환",team:"mk1", gender:"m" },
+          { name:"김동일",team:"d2c", gender:"m" },
+          { name:"이채림",team:"d2c", gender:"f" },
+          { name:"김희진",team:"mk1", gender:"f" },
+          { name:"박지우",team:"d2c", gender:"f" },
+          { name:"박연",  team:"mk2", gender:"f" },
+          { name:"최현진",team:"mk1", gender:"f" },
+        ]
+      },
+    ];
+
+    function DinnerMember({ m }) {
+      const t = TC[m.team];
+      return (
+        <div className="d-member">
+          <div className="d-dot" style={{ background: t.dot }} />
+          <span className="d-name">{m.name}</span>
+          {m.leader && <span className="d-leader">★리더</span>}
+          <span className="d-team" style={{ background: t.bg, color: t.color }}>{t.label}</span>
+          <span className={`d-gender ${m.gender}`}>{m.gender === 'm' ? '♂' : '♀'}</span>
+        </div>
+      );
+    }
+
+    function DinnerTable({ t }) {
+      return (
+        <div className="d-table-card" style={{ borderTop: `3px solid ${t.color}` }}>
+          <div className="d-table-header">
+            <div>
+              <div className="d-table-num">TABLE {t.num}</div>
+              <div className="d-table-title">{t.title}</div>
+            </div>
+            <div className="d-seat-count">{t.members.length}석</div>
+          </div>
+          <div className="d-members">
+            {t.members.map((m, i) => <DinnerMember key={i} m={m} />)}
+          </div>
+        </div>
+      );
+    }
+
+    function DinnerSection() {
+      const [dTab, setDTab] = useState("t6");
+      const tables = dTab === "t6" ? tables6 : tables8;
+      return (
+        <div style={{ maxWidth: 1300, margin: "0 auto", textAlign: "left" }}>
+
+          {/* 회식 정보 배너 */}
+          <div className="dinner-info-banner">
+            <div className="info-block">
+              <span className="info-icon">🍻</span>
+              <div>
+                <div className="info-label">1Q 2026 Team Dinner</div>
+                <div className="info-value">라이프마케팅실 회식</div>
+              </div>
+            </div>
+            <div className="dinner-divider" />
+            <div className="info-block">
+              <span className="info-icon">📅</span>
+              <div>
+                <div className="info-label">일시</div>
+                <div className="info-value">3/31(화) 오후 6시</div>
+              </div>
+            </div>
+            <div className="dinner-divider" />
+            <div className="info-block">
+              <span className="info-icon">📍</span>
+              <div>
+                <div className="info-label">장소</div>
+                <div className="info-tba">TBA</div>
+              </div>
+            </div>
+          </div>
+
+          {/* 범례 */}
+          <div className="d-legend">
+            <div className="d-legend-item"><div className="d-dot" style={{ background: "#5f8c7a" }} />D2C팀</div>
+            <div className="d-legend-item"><div className="d-dot" style={{ background: "#7a94b0" }} />마케팅 2팀</div>
+            <div className="d-legend-item"><div className="d-dot" style={{ background: "#b07a5a" }} />마케팅 3팀</div>
+            <div className="d-legend-item"><div className="d-dot" style={{ background: "#8a7060" }} />마케팅 1팀</div>
+            <div className="d-legend-item"><span style={{ color:"#C4955A", fontWeight:800 }}>★</span>&nbsp;리더</div>
+          </div>
+
+          {/* 버전 탭 */}
+          <div className="d-tab-wrap">
+            <button className={`d-tab${dTab === "t6" ? " active" : ""}`} onClick={() => setDTab("t6")}>6명 × 4테이블</button>
+            <button className={`d-tab${dTab === "t8" ? " active" : ""}`} onClick={() => setDTab("t8")}>7~8명 × 3테이블</button>
+          </div>
+
+          {/* 테이블 카드 */}
+          <div className="d-tables-grid">
+            {tables.map(t => <DinnerTable key={t.num} t={t} />)}
+          </div>
+
+        </div>
+      );
+    }
+
+    /* ──────────────────────────────────────
+       메인 앱
+    ────────────────────────────────────── */
+    function App() {
+      const [teams, setTeams] = useState(initialTeams);
+      const [products, setProducts] = useState(initialProducts);
+      const [editMode, setEditMode] = useState(false);
+      const [activeTab, setActiveTab] = useState("org");
+      const updateTeam = (id, updated) => setTeams(ts => ts.map(t => t.id === id ? updated : t));
+
+      const tabs = [
+        { id: "org",     label: "📋 조직도" },
+        { id: "slack",   label: "💬 슬랙 채널" },
+        { id: "seat",    label: "🪑 자리배치도" },
+        { id: "dinner",  label: "🍽️ 회식 일자/배치" },
+      ];
+
+      const sectionTitle = {
+        org:    { icon: "📋", title: "조직도", sub: "라이프마케팅실 팀 구성 및 역할" },
+        slack:  { icon: "💬", title: "슬랙 채널 운영 · 소통 창구", sub: "채널별 목적 및 운영 방식" },
+        seat:   { icon: "🪑", title: "자리배치도", sub: "자리 이동 일자 : 3/25(수) 오후 5시" },
+        dinner: { icon: "🍽️", title: "회식 일자 / 배치", sub: "3/31(화) 오후 6시 · 장소 TBA" },
+      };
+
+      const s = sectionTitle[activeTab];
+
+      return (
+        <div style={{ minHeight: "100vh", background: "linear-gradient(155deg, #F7F2ED 0%, #EDF1F7 100%)", fontFamily: "'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif", padding: "36px 24px 80px" }}>
+
+          {/* 헤더 */}
+          <div style={{ textAlign: "center", marginBottom: 28 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "linear-gradient(135deg, #3A2310, #6B3D18)", color: "#fff", padding: "10px 28px", borderRadius: 40, fontSize: 20, fontWeight: 800, letterSpacing: "0.04em", boxShadow: "0 6px 24px rgba(90,40,10,0.2)" }}>
+                🏢 라이프마케팅실
+              </div>
+              {activeTab !== "dinner" && (
+                <button onClick={() => setEditMode(e => !e)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 18px", borderRadius: 40, border: editMode ? "2px solid #2D6B9A" : "2px solid #ccc", background: editMode ? "#2D6B9A" : "#fff", color: editMode ? "#fff" : "#555", fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: editMode ? "0 4px 16px rgba(45,107,154,0.25)" : "0 2px 8px rgba(0,0,0,0.08)" }}>
+                  {editMode ? "✅ 완료" : "✏️ 수정"}
+                </button>
+              )}
+            </div>
+
+            {/* 탭 메뉴 */}
+            <div style={{ display: "flex", justifyContent: "center", gap: 6, marginBottom: 28 }}>
+              {tabs.map(t => (
+                <button key={t.id} onClick={() => { setActiveTab(t.id); setEditMode(false); }} style={{ padding: "9px 22px", borderRadius: 30, fontSize: 13, fontWeight: 700, cursor: "pointer", border: activeTab === t.id ? "2px solid #3A2310" : "2px solid #ddd", background: activeTab === t.id ? "#3A2310" : "#fff", color: activeTab === t.id ? "#fff" : "#555", transition: "all 0.18s", boxShadow: activeTab === t.id ? "0 4px 16px rgba(58,35,16,0.18)" : "0 1px 4px rgba(0,0,0,0.07)" }}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {/* 섹션 타이틀 */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: activeTab === "org" ? 10 : 28 }}>
+              <div style={{ width: 4, height: 26, background: "linear-gradient(#B87A4A, #5A7A6A)", borderRadius: 4 }} />
+              <div style={{ textAlign: "left" }}>
+                <div style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a" }}>{s.icon} {s.title}</div>
+                <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{s.sub}</div>
+              </div>
+            </div>
+
+            {editMode && activeTab !== "dinner" && (
+              <div style={{ display: "inline-block", background: "#EBF5FF", border: "1px solid #AACCEE", borderRadius: 8, padding: "6px 16px", fontSize: 12, color: "#2D6B9A", fontWeight: 600, marginBottom: 14 }}>
+                ✏️ 수정 모드 — 이름·직무·메모·제품명을 클릭해 편집
+              </div>
+            )}
+          </div>
+
+          {/* 조직도 탭 */}
+          {activeTab === "org" && (
+            <>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#fff", border: "2px solid #B87A4A", borderRadius: 50, padding: "9px 22px 9px 10px", boxShadow: "0 2px 16px rgba(184,122,74,0.14)" }}>
+                  <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg, #C8956C, #955A25)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 16 }}>이</div>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: 15, color: "#1a1a1a" }}>이수지</div>
+                    <div style={{ fontSize: 11, color: "#B87A4A", fontWeight: 600 }}>실장(대행) · 마케터</div>
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: "flex", justifyContent: "center", margin: "10px 0 14px" }}>
+                <div style={{ width: 2, height: 22, background: "linear-gradient(#B87A4A66, #ddd)" }} />
+              </div>
+              <div style={{ display: "flex", gap: 18, flexWrap: "wrap", justifyContent: "center", maxWidth: 1300, margin: "0 auto", alignItems: "flex-start" }}>
+                {teams.map(team => (
+                  <TeamCard key={team.id} team={team} editMode={editMode} onTeamChange={u => updateTeam(team.id, u)} />
+                ))}
+              </div>
+              <ProductRoadmap products={products} editMode={editMode} onProductsChange={setProducts} />
+
+              {/* Role 범례 */}
+              <div style={{ maxWidth: 820, margin: "44px auto 0", background: "#fff", borderRadius: 14, padding: "18px 22px", boxShadow: "0 2px 16px rgba(0,0,0,0.06)", border: "1px solid #E8E8E8" }}>
+                <div style={{ fontSize: 10, fontWeight: 800, color: "#bbb", letterSpacing: "0.12em", marginBottom: 16, textTransform: "uppercase" }}>Role 범례</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  {[
+                    { label: "기획 · 마케팅", roles: ["팀장", "마케터", "퍼포먼스 마케터", "CRM 마케터", "온사이트마케터", "바이럴마케터", "MD"] },
+                    { label: "콘텐츠",        roles: ["콘텐츠마케터", "콘텐츠기획자", "영상 PD"] },
+                    { label: "기술 · 데이터", roles: ["데이터엔지니어", "웹퍼블리셔"] },
+                  ].map(section => (
+                    <div key={section.label}>
+                      <div style={{ fontSize: 10, fontWeight: 800, color: "#aaa", letterSpacing: "0.08em", marginBottom: 7 }}>{section.label}</div>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+                        {section.roles.map(role => {
+                          const conf = roleConfig[role];
+                          if (!conf) return null;
+                          return <span key={role} style={{ fontSize: 11, fontWeight: 700, color: conf.color, background: conf.bg, padding: "4px 11px", borderRadius: 20, border: `1px solid ${conf.color}33` }}>{role}</span>;
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* 슬랙 채널 탭 */}
+          {activeTab === "slack" && <SlackView />}
+
+          {/* 업무 자리배치 탭 */}
+          {activeTab === "seat" && (
+            <div style={{ maxWidth: 1000, margin: "0 auto", textAlign: "left" }}>
+              <div style={{ background: "#F7F2ED", borderRadius: 16, border: "1px solid #e4ddd4", boxShadow: "0 4px 24px rgba(0,0,0,0.08)", padding: 24 }}
+                dangerouslySetInnerHTML={{ __html: `
+<style>
+.sc{font-size:10px;padding:12px;overflow-x:auto;}
+.s{width:52px;height:42px;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;flex-shrink:0;padding:2px;box-sizing:border-box;border:0.5px solid;line-height:1.3;}
+.emp{background:#EDE7DF;border-color:#C8BFB5;color:#9a8f87;font-size:9px;}
+.blu{background:#B5D4F4;border-color:#185FA5;color:#042C53;}
+.gry{background:#D3D1C7;border-color:#888780;color:#2C2C2A;}
+.brn{background:#F5C4B3;border-color:#993C1D;color:#4A1B0C;}
+.org{background:#FAC775;border-color:#BA7517;color:#412402;}
+.yel{background:#fef08a;border-color:#ca8a04;color:#412402;}
+.col{display:flex;flex-direction:column;gap:2px;}
+.row{display:flex;gap:2px;}
+.grp{display:flex;flex-direction:column;gap:2px;}
+.g{width:8px;flex-shrink:0;}
+.rl{background:#EDE7DF;border:0.5px solid #C8BFB5;border-radius:4px;font-size:10px;font-weight:500;color:#7a6f66;display:flex;align-items:center;justify-content:center;text-align:center;}
+.nm{font-weight:500;font-size:10px;}
+.wide{width:108px;}
+.mdhub{border:1.5px dashed #378ADD;border-radius:6px;padding:6px 5px 5px;background:rgba(181,212,244,0.15);}
+.mdhub-label{font-size:9px;font-weight:500;color:#185FA5;text-align:center;margin-bottom:4px;}
+.legend-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0;}
+</style>
+<div class="sc">
+<div class="row" style="align-items:flex-start;margin-bottom:16px;flex-wrap:nowrap;">
+  <div class="rl" style="writing-mode:vertical-lr;transform:rotate(180deg);width:18px;height:232px;margin-right:6px;flex-shrink:0;">부대표실</div>
+  <div class="col" style="margin-top:44px;">
+    <div class="s emp">공석</div>
+    <div class="s emp">공석</div>
+    <div class="s emp">공석</div>
+    <div class="s emp">공석</div>
+  </div>
+  <div class="g"></div>
+  <div class="grp">
+    <div class="s blu wide"><div class="nm">이수지</div></div>
+    <div class="row">
+      <div class="s blu"><div class="nm">김희재</div></div>
+      <div class="s blu"><div class="nm">전찬희</div></div>
+    </div>
+    <div class="row">
+      <div class="s blu"><div class="nm">이채림</div></div>
+      <div class="s blu"><div class="nm">전보경</div></div>
+    </div>
+    <div class="row">
+      <div class="s blu"><div class="nm">김동일</div></div>
+      <div class="s blu"><div class="nm">박지우</div></div>
+    </div>
+    <div class="row">
+      <div class="s blu"><div class="nm">이은서</div></div>
+      <div class="s emp">공석</div>
+    </div>
+  </div>
+  <div class="g"></div>
+  <div class="grp">
+    <div class="s brn wide"><div class="nm">정재연</div></div>
+    <div class="row">
+      <div class="s emp">공석</div>
+      <div class="s brn"><div class="nm">리아</div></div>
+    </div>
+    <div class="row">
+      <div class="s emp">공석</div>
+      <div class="s brn"><div class="nm">김승희</div></div>
+    </div>
+    <div class="row">
+      <div class="s emp">공석</div>
+      <div class="s brn"><div class="nm">송채연</div></div>
+    </div>
+    <div class="row">
+      <div class="s emp">공석</div>
+      <div class="s brn"><div class="nm">조영진</div></div>
+    </div>
+  </div>
+  <div class="g"></div>
+  <div class="grp">
+    <div class="s org wide"><div class="nm">강수빈</div></div>
+    <div class="row">
+      <div class="s org"><div class="nm">고태웅</div></div>
+      <div class="s org"><div class="nm">박가람</div></div>
+    </div>
+    <div class="row">
+      <div class="s org"><div class="nm">노송연</div></div>
+      <div class="s org"><div class="nm">심혜원</div></div>
+    </div>
+    <div class="row">
+      <div class="s emp">공석</div>
+      <div class="s org"><div class="nm">허수영</div></div>
+    </div>
+    <div class="row">
+      <div class="s emp">공석</div>
+      <div class="s emp">공석</div>
+    </div>
+  </div>
+  <div class="g"></div>
+  <div class="col" style="margin-top:44px;">
+    <div class="s emp">공석</div>
+    <div class="s org"><div class="nm">박효만</div></div>
+    <div class="s org"><div class="nm">김민영</div></div>
+    <div class="s emp">공석</div>
+  </div>
+  <div class="g"></div>
+  <div class="col" style="gap:4px;width:44px;flex-shrink:0;">
+    <div class="rl" style="height:52px;">탕비실</div>
+    <div class="rl" style="writing-mode:vertical-lr;transform:rotate(180deg);flex:1;min-height:110px;">스튜디오</div>
+    <div class="rl" style="height:48px;">창고</div>
+  </div>
+</div>
+<div style="border-top:1.5px dashed #C8BFB5;margin:4px 0 16px;"></div>
+<div class="row" style="align-items:flex-start;flex-wrap:nowrap;gap:0;">
+  <div class="col" style="gap:2px;margin-right:4px;flex-shrink:0;margin-top:2px;">
+    <div style="writing-mode:vertical-lr;transform:rotate(180deg);font-size:8px;color:#9a8f87;height:44px;display:flex;align-items:center;justify-content:center;">공석</div>
+    <div style="writing-mode:vertical-lr;transform:rotate(180deg);font-size:8px;color:#9a8f87;height:44px;display:flex;align-items:center;justify-content:center;">공석</div>
+    <div style="writing-mode:vertical-lr;transform:rotate(180deg);font-size:8px;color:#9a8f87;height:44px;display:flex;align-items:center;justify-content:center;">공석</div>
+  </div>
+  <div class="grp">
+    <div class="row">
+      <div class="s emp">공석</div>
+      <div class="s blu"><div class="nm">류선주</div></div>
+    </div>
+    <div class="row">
+      <div class="s blu"><div class="nm">남의현</div></div>
+      <div class="s blu"><div class="nm">김택정</div></div>
+    </div>
+    <div class="row">
+      <div class="s blu"><div class="nm">김보람</div></div>
+      <div class="s blu"><div class="nm">최연희</div></div>
+    </div>
+    <div class="s blu wide"><div class="nm">오도근</div></div>
+  </div>
+  <div class="g"></div>
+  <div class="grp">
+    <div class="row">
+      <div class="s emp">공석</div>
+      <div class="s emp">공석</div>
+    </div>
+    <div class="row">
+      <div class="s emp">공석</div>
+      <div class="s blu"><div class="nm">최현진</div></div>
+    </div>
+    <div class="row">
+      <div class="s blu"><div class="nm">김익환</div></div>
+      <div class="s blu"><div class="nm">김희진</div></div>
+    </div>
+    <div class="s blu wide"><div class="nm">허근</div></div>
+  </div>
+  <div class="g"></div>
+  <div class="grp">
+    <div class="row">
+      <div class="s blu"><div class="nm">배가영</div></div>
+      <div class="s blu"><div class="nm">최예슬</div></div>
+    </div>
+    <div class="row">
+      <div class="s blu"><div class="nm">황은인</div></div>
+      <div class="s blu"><div class="nm">박연</div></div>
+    </div>
+    <div class="row">
+      <div class="s blu"><div class="nm">권민창</div></div>
+      <div class="s blu"><div class="nm">김진호</div></div>
+    </div>
+    <div class="s blu wide"><div class="nm">우희강</div></div>
+  </div>
+  <div class="g"></div>
+  <div class="mdhub">
+    <div class="mdhub-label">MD허브팀 이동 예정</div>
+    <div class="col" style="gap:2px;">
+      <div class="row"><div class="s emp">공석</div><div class="s emp">공석</div></div>
+      <div class="row"><div class="s emp">공석</div><div class="s emp">공석</div></div>
+      <div class="row"><div class="s emp">공석</div><div class="s emp">공석</div></div>
+      <div class="row"><div class="s emp">공석</div><div class="s emp">공석</div></div>
+    </div>
+  </div>
+  <div class="g"></div>
+  <div class="col" style="gap:4px;flex-shrink:0;">
+    <div class="row" style="gap:4px;">
+      <div class="rl" style="width:44px;height:88px;">창고</div>
+      <div class="rl" style="width:44px;height:88px;">2회의실</div>
+    </div>
+    <div class="row" style="gap:4px;">
+      <div class="rl" style="width:44px;height:88px;">전산실</div>
+      <div class="rl" style="width:44px;height:88px;">1회의실</div>
+    </div>
+  </div>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;padding-top:10px;border-top:0.5px solid #C8BFB5;">
+  <div style="display:flex;align-items:center;gap:4px;"><div class="legend-dot" style="background:#B5D4F4;border:0.5px solid #185FA5;"></div><span style="font-size:10px;color:#7a6f66;">파란색</span></div>
+  <div style="display:flex;align-items:center;gap:4px;"><div class="legend-dot" style="background:#D3D1C7;border:0.5px solid #888780;"></div><span style="font-size:10px;color:#7a6f66;">회색 (박은솔·염주하)</span></div>
+  <div style="display:flex;align-items:center;gap:4px;"><div class="legend-dot" style="background:#F5C4B3;border:0.5px solid #993C1D;"></div><span style="font-size:10px;color:#7a6f66;">갈색 (정재연·리아·김승희·송채연·조영진)</span></div>
+  <div style="display:flex;align-items:center;gap:4px;"><div class="legend-dot" style="background:#FAC775;border:0.5px solid #BA7517;"></div><span style="font-size:10px;color:#7a6f66;">주황색 (강수빈·고태웅·노송연·박가람·심혜원·허수영·박효만·김민영)</span></div>
+  <div style="display:flex;align-items:center;gap:4px;"><div class="legend-dot" style="border:1.5px dashed #378ADD;background:rgba(181,212,244,0.15);"></div><span style="font-size:10px;color:#7a6f66;">MD허브팀 이동 예정</span></div>
+</div>
+</div>
+                `}}
+              />
+            </div>
+          )}
+
+          {/* 회식 배치 탭 */}
+          {activeTab === "dinner" && <DinnerSection />}
+
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
