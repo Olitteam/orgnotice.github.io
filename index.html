@@ -517,60 +517,13 @@
       d2c: { dot: "#5f8c7a", bg: "rgba(95,140,122,0.12)",  color: "#5f8c7a",  label: "D2C팀"     },
     };
 
-    // 6명 × 4테이블
-    const tables6 = [
-      {
-        num:"01", title:"🌿 Table 1", color:"#8a7060",
-        members:[
-          { name:"허근",  team:"mk1", gender:"m", leader:true },
-          { name:"김택정",team:"mk3", gender:"m" },
-          { name:"이채림",team:"d2c", gender:"f" },
-          { name:"김동일",team:"d2c", gender:"m" },
-          { name:"김희진",team:"mk1", gender:"f" },
-          { name:"배가영",team:"mk2", gender:"f" },
-        ]
-      },
-      {
-        num:"02", title:"🔥 Table 2", color:"#5f8c7a",
-        members:[
-          { name:"이수지",team:"d2c", gender:"f", leader:true },
-          { name:"김보람",team:"mk3", gender:"f" },
-          { name:"김진호",team:"mk2", gender:"m" },
-          { name:"황은인",team:"mk2", gender:"f" },
-          { name:"김희재",team:"d2c", gender:"f" },
-        ]
-      },
-      {
-        num:"03", title:"💫 Table 3", color:"#b07a5a",
-        members:[
-          { name:"오도근",team:"mk3", gender:"m", leader:true },
-          { name:"최연희",team:"mk3", gender:"f" },
-          { name:"권민창",team:"mk2", gender:"m" },
-          { name:"류선주",team:"mk3", gender:"f" },
-          { name:"전보경",team:"d2c", gender:"f" },
-          { name:"박지우",team:"d2c", gender:"f" },
-        ]
-      },
-      {
-        num:"04", title:"⚡ Table 4", color:"#7a94b0",
-        members:[
-          { name:"우희강",team:"mk2", gender:"m", leader:true },
-          { name:"김익환",team:"mk1", gender:"m" },
-          { name:"남의현",team:"mk3", gender:"f" },
-          { name:"최현진",team:"mk1", gender:"f" },
-          { name:"이은서",team:"d2c", gender:"f" },
-          { name:"전찬희",team:"d2c", gender:"f" },
-        ]
-      },
-    ];
-
     // 8명 × 3테이블 (7 / 8 / 8)
     const tables8 = [
       {
         num:"01", title:"🌿 Table 1", color:"#5f8c7a",
         members:[
           { name:"이수지",team:"d2c", gender:"f", leader:true },
-          { name:"김보람",team:"mk3", gender:"f" },
+          { name:"김희진",team:"mk1", gender:"f" },
           { name:"김희재",team:"d2c", gender:"f" },
           { name:"황은인",team:"mk2", gender:"f" },
           { name:"김진호",team:"mk2", gender:"m" },
@@ -585,8 +538,7 @@
           { name:"최연희",team:"mk3", gender:"f" },
           { name:"배가영",team:"mk2", gender:"f" },
           { name:"권민창",team:"mk2", gender:"m" },
-          { name:"전찬희",team:"d2c", gender:"f" },
-          { name:"전보경",team:"d2c", gender:"f" },
+          { name:"이채림",team:"d2c", gender:"f" },
           { name:"남의현",team:"mk3", gender:"f" },
         ]
       },
@@ -596,8 +548,7 @@
           { name:"우희강",team:"mk2", gender:"m", leader:true },
           { name:"김익환",team:"mk1", gender:"m" },
           { name:"김동일",team:"d2c", gender:"m" },
-          { name:"이채림",team:"d2c", gender:"f" },
-          { name:"김희진",team:"mk1", gender:"f" },
+          { name:"전찬희",team:"d2c", gender:"f" },
           { name:"박지우",team:"d2c", gender:"f" },
           { name:"박연",  team:"mk2", gender:"f" },
           { name:"최현진",team:"mk1", gender:"f" },
@@ -636,8 +587,7 @@
     }
 
     function DinnerSection() {
-      const [dTab, setDTab] = useState("t6");
-      const tables = dTab === "t6" ? tables6 : tables8;
+      const tables = tables8;
       return (
         <div style={{ maxWidth: 1300, margin: "0 auto", textAlign: "left" }}>
 
@@ -675,12 +625,6 @@
             <div className="d-legend-item"><div className="d-dot" style={{ background: "#b07a5a" }} />마케팅 3팀</div>
             <div className="d-legend-item"><div className="d-dot" style={{ background: "#8a7060" }} />마케팅 1팀</div>
             <div className="d-legend-item"><span style={{ color:"#C4955A", fontWeight:800 }}>★</span>&nbsp;리더</div>
-          </div>
-
-          {/* 버전 탭 */}
-          <div className="d-tab-wrap">
-            <button className={`d-tab${dTab === "t6" ? " active" : ""}`} onClick={() => setDTab("t6")}>6명 × 4테이블</button>
-            <button className={`d-tab${dTab === "t8" ? " active" : ""}`} onClick={() => setDTab("t8")}>7~8명 × 3테이블</button>
           </div>
 
           {/* 테이블 카드 */}
